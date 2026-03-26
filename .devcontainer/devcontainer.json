@@ -1,0 +1,44 @@
+{
+    "name": "Mock Interview Fullstack Dev",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    // 注入前端开发所需的 Node.js 环境 (取代 nvm)
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20",
+            "pnpm": true
+        }
+    },
+    // 暴露前端 Vite 和后端 FastAPI 的端口
+    "forwardPorts": [
+        5173,
+        8000
+    ],
+    // 极其重要：将宿主机（Windows/Linux）的 Nvidia 显卡透传进容器，供 SenseVoice 和 PyTorch 使用
+    "runArgs": [
+        "--gpus",
+        "all",
+        "--ipc=host"
+    ],
+    // 容器创建完成后的自动化生命周期脚本
+    "postCreateCommand": "cd backend && conda env create -f environment.yml || conda env update -f environment.yml",
+    // 统一团队的 VS Code 插件和设置
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "python.terminal.activateEnvironment": true
+            },
+            "extensions": [
+                "ms-python.python", // Python 核心
+                "ms-python.vscode-pylance", // Python 代码提示
+                "Vue.volar", // Vue 3 核心支持
+                "dbaeumer.vscode-eslint", // 代码规范
+                "esbenp.prettier-vscode" // 代码格式化
+            ]
+        }
+    },
+    // 使用当前登录主机的用户，避免容器内外文件权限错乱
+    "remoteUser": "vscode"
+}
