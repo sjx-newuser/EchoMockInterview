@@ -46,8 +46,8 @@ Echo Mock System 是一个由 AI 驱动的沉浸式模拟面试平台。结合 R
 - **启动后端**: 
   ```bash
   cd backend
-  poetry install  # 按需加装 Poetry 环境依赖
-  poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  conda activate mock-interview   
+  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
   ```
 
 ---
