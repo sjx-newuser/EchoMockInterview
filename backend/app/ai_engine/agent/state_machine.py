@@ -8,7 +8,7 @@ Echo Mock System - Agent 状态机与生命周期管理
 import logging
 from typing import Tuple
 
-from app.ai_engine.rag.prompts import STAGE_PROMPTS
+from app.ai_engine.rag.prompts import STAGE_PROMPTS, INTERVIEWER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -48,21 +48,21 @@ class InterviewStateMachine:
         else:
             return InterviewStage.REVERSE_QA
 
-    def get_stage_prompt(self, current_round: int, retrieved_context: str = "") -> Tuple[str, str]:
+    def get_stage_prompt(self, current_round: int) -> Tuple[str, str]:
         """
         获取当前阶段的标识和构建好的 Prompt。
-        对于需要 RAG 知识支撑的阶段，需要传入 retrieved_context。
+        注意: 如阶段包含 {retrieved_questions} 占位符，由调用方负责替换 RAG 知识。
         
-        返回: (stage_name, prompt_string)
+        返回: (stage_name, full_system_prompt_string)
         """
         stage = self.get_current_stage(current_round)
-        prompt_template = STAGE_PROMPTS.get(stage, STAGE_PROMPTS[InterviewStage.ICEBREAK])
+        stage_template = STAGE_PROMPTS.get(stage, STAGE_PROMPTS[InterviewStage.ICEBREAK])
 
-        # 针对需要植入外部知识的特殊阶段进行格式化
-        if stage in (InterviewStage.FUNDAMENTALS, InterviewStage.SCENARIO):
-            prompt = prompt_template.format(retrieved_questions=retrieved_context or "暂无参考题目，请根据目标岗位自由提问。")
-        else:
-            prompt = prompt_template
+        # 包装核心人设（强制注入目标岗位约束）
+        full_system_prompt = INTERVIEWER_SYSTEM_PROMPT.format(
+            target_role=self.target_role,
+            current_stage=stage_template
+        )
 
         logger.debug(f"[StateMachine] 计算得出当前阶段: {stage} (Round {current_round})")
-        return stage, prompt
+        return stage, full_system_prompt

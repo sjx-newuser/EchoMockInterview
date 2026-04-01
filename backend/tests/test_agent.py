@@ -34,15 +34,20 @@ class TestInterviewStateMachine:
         stage, prompt = self.sm.get_stage_prompt(0)
         assert stage == InterviewStage.ICEBREAK
         assert "【破冰阶段】" in prompt
+        assert "后端工程师" in prompt  # 验证核心人设是否包装进去了
 
     def test_get_stage_prompt_with_rag(self):
-        """测试需要注入 RAG 上下文的 Prompt"""
-        retrieved = "1. 什么是 Redis 雪崩？"
-        stage, prompt = self.sm.get_stage_prompt(5, retrieved_context=retrieved)
+        """测试包含 RAG 占位符的 Prompt 及其替换机制"""
+        stage, raw_sys_prompt = self.sm.get_stage_prompt(5)
         
         assert stage == InterviewStage.FUNDAMENTALS
-        assert "【检索到的参考题目】" in prompt
-        assert "Redis 雪崩" in prompt
+        assert "【检索到的参考题目】" in raw_sys_prompt
+        assert "{retrieved_questions}" in raw_sys_prompt
+        
+        # 模拟 ws_manager 中的替换机制
+        retrieved = "1. 什么是 Redis 雪崩？"
+        final_prompt = raw_sys_prompt.replace("{retrieved_questions}", retrieved)
+        assert "Redis 雪崩" in final_prompt
 
 
 # =============================================

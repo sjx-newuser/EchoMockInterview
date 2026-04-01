@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     Enum,
@@ -99,6 +100,7 @@ class InterviewSession(Base):
     overall_score = Column(Float, nullable=True, comment="综合总分（面试完成后计算）")
     dimension_scores = Column(JSON, nullable=True, comment="多维度能力得分（结构化数据，供 ECharts 渲染）")
     comprehensive_report = Column(Text, nullable=True, comment="大模型生成的最终整体评价与建议")
+    is_favorite = Column(Boolean, default=False, comment="是否收藏")
 
     # 关联关系
     user = relationship("User", back_populates="sessions")

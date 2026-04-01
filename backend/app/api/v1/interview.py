@@ -52,3 +52,35 @@ async def get_interview_detail(
             detail="面试场次不存在",
         )
     return session
+
+
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_interview(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """彻底删除一个面试场次及其关联数据。"""
+    success = await InterviewService.delete_session(db, session_id, user.id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="面试场次不存在或无权限删除",
+        )
+    return
+
+
+@router.patch("/{session_id}/favorite", response_model=InterviewBrief)
+async def toggle_favorite(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """切换面试场次的收藏状态。"""
+    session = await InterviewService.toggle_favorite(db, session_id, user.id)
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="面试场次不存在或无权限操作",
+        )
+    return session

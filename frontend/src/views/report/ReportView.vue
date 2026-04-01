@@ -1,8 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getReport } from '../../api/report'
 import RadarChart from '../../components/chart/RadarChart.vue'
+
+const parseMarkdown = (text: string) => {
+  if (!text) return ''
+  return text
+    // Headings
+    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+    // Bold
+    .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
+    // Lists
+    .replace(/^\s*-\s+(.*$)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gms, '<ul>$1</ul>')
+    .replace(/<\/ul>\s*<ul>/g, '')
+    // Numbered Lists
+    .replace(/^\s*\d+\.\s+(.*$)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gms, '<ol>$1</ol>')
+    .replace(/<\/ol>\s*<ol>/g, '')
+    // Paragraphs / Line breaks
+    .replace(/\n\n/g, '<br/><br/>')
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -21,6 +42,10 @@ const fetchReport = async () => {
     loading.value = false
   }
 }
+
+const renderedReport = computed(() => {
+  return report.value?.comprehensive_report ? parseMarkdown(report.value.comprehensive_report) : ''
+})
 
 onMounted(() => {
   fetchReport()
@@ -62,9 +87,7 @@ onMounted(() => {
       <!-- Detailed Analysis -->
       <section class="analysis-section glass-panel">
         <h2 class="section-title">综合评价报告</h2>
-        <div class="markdown-body">
-          {{ report.comprehensive_report }}
-        </div>
+        <div class="markdown-body" v-html="renderedReport"></div>
       </section>
 
       <!-- Questions Breakdown -->
@@ -110,6 +133,26 @@ onMounted(() => {
 .page-title {
   font-size: 28px;
   font-weight: 800;
+}
+
+.btn-back {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--color-text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-back:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateX(-2px);
 }
 
 .grid-2 {
@@ -181,9 +224,33 @@ onMounted(() => {
 }
 
 .markdown-body {
-  white-space: pre-wrap;
   line-height: 1.8;
   color: var(--color-text-primary);
+}
+
+.markdown-body :deep(h2) {
+  font-size: 1.25rem;
+  margin: 24px 0 16px;
+  color: var(--color-accent);
+}
+
+.markdown-body :deep(h3) {
+  font-size: 1.1rem;
+  margin: 20px 0 12px;
+}
+
+.markdown-body :deep(ul), .markdown-body :deep(ol) {
+  padding-left: 20px;
+  margin: 16px 0;
+}
+
+.markdown-body :deep(li) {
+  margin-bottom: 8px;
+}
+
+.markdown-body :deep(strong) {
+  color: var(--color-accent);
+  font-weight: 700;
 }
 
 .qa-section {

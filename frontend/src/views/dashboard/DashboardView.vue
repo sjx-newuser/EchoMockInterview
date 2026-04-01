@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../store/auth'
-import { listInterviews, createInterview } from '../../api/interview'
+import { listInterviews, createInterview, deleteInterview, toggleFavorite } from '../../api/interview'
 import InterviewCard from '../../components/common/InterviewCard.vue'
 
 const router = useRouter()
@@ -43,6 +43,27 @@ const handleStartInterview = async () => {
 const handleLogout = () => {
   authStore.clearAuth()
   router.push('/login')
+}
+
+const handleDelete = async (sessionId: string) => {
+  try {
+    await deleteInterview(sessionId)
+    interviews.value = interviews.value.filter(i => i.id !== sessionId)
+  } catch (error) {
+    console.error('Failed to delete interview:', error)
+  }
+}
+
+const handleToggleFavorite = async (sessionId: string) => {
+  try {
+    const updated = await toggleFavorite(sessionId)
+    const index = interviews.value.findIndex(i => i.id === sessionId)
+    if (index !== -1) {
+      interviews.value[index].is_favorite = updated.is_favorite
+    }
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error)
+  }
 }
 
 onMounted(() => {
@@ -103,6 +124,8 @@ onMounted(() => {
             @click="router.push(`/interview/${item.id}`)"
             @view-report="router.push(`/report/${item.id}`)"
             @continue="router.push(`/interview/${item.id}`)"
+            @delete="handleDelete(item.id)"
+            @toggle-favorite="handleToggleFavorite(item.id)"
           />
         </div>
       </section>

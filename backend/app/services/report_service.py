@@ -9,7 +9,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models import InterviewSession
+from datetime import datetime
+from app.db.models import InterviewSession, SessionStatus
 from app.ai_engine.evaluator import evaluator
 
 
@@ -52,6 +53,8 @@ class ReportService:
             session.overall_score = res.get("overall_score")
             session.dimension_scores = res.get("dimension_scores")
             session.comprehensive_report = res.get("report_markdown")
+            session.status = SessionStatus.COMPLETED
+            session.end_time = datetime.utcnow()
             
             await db.commit()
             await db.refresh(session)

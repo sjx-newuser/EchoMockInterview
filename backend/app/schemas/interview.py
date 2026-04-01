@@ -28,6 +28,7 @@ class InterviewBrief(BaseModel):
     start_time: datetime
     end_time: Optional[datetime] = None
     overall_score: Optional[float] = None
+    is_favorite: bool = False
 
     class Config:
         from_attributes = True
@@ -41,6 +42,7 @@ class InterviewDetail(BaseModel):
     start_time: datetime
     end_time: Optional[datetime] = None
     overall_score: Optional[float] = None
+    is_favorite: bool = False
     dimension_scores: Optional[Dict[str, Any]] = None
     comprehensive_report: Optional[str] = None
     messages: List["MessageItem"] = []

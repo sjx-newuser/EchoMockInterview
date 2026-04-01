@@ -236,7 +236,9 @@ class ConnectionManager:
         if "{retrieved_questions}" in raw_sys_prompt:
             retrieved_nodes = dual_retriever.retrieve_questions(ctx.target_role, top_k=2)
             retrieved_text = dual_retriever.format_results(retrieved_nodes)
-            sys_prompt = raw_sys_prompt.format(retrieved_questions=retrieved_text)
+            if not retrieved_text.strip():
+                retrieved_text = "暂无参考题目，请根据目标岗位自由提问。"
+            sys_prompt = raw_sys_prompt.replace("{retrieved_questions}", retrieved_text)
 
         await self._stream_llm_response(session_id, ctx, sys_prompt)
 
@@ -290,7 +292,9 @@ class ConnectionManager:
         if "{retrieved_questions}" in raw_sys_prompt:
             retrieved_nodes = dual_retriever.retrieve_questions(ctx.target_role, top_k=2)
             retrieved_text = dual_retriever.format_results(retrieved_nodes)
-            sys_prompt = raw_sys_prompt.format(retrieved_questions=retrieved_text)
+            if not retrieved_text.strip():
+                retrieved_text = "暂无参考题目，请根据目标岗位自由提问。"
+            sys_prompt = raw_sys_prompt.replace("{retrieved_questions}", retrieved_text)
 
         await self._stream_llm_response(session_id, ctx, sys_prompt)
 

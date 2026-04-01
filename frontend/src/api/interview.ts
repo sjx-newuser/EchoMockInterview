@@ -15,6 +15,7 @@ export interface InterviewBrief {
   start_time: string
   end_time: string | null
   overall_score: number | null
+  is_favorite: boolean
 }
 
 export interface MessageItem {
@@ -43,3 +44,11 @@ export const listInterviews = () =>
 /** 获取面试场次详情 */
 export const getInterviewDetail = (sessionId: string) =>
   request.get<any, InterviewDetail>(`/interviews/${sessionId}`)
+
+/** 删除面试场次 */
+export const deleteInterview = (sessionId: string) =>
+  request.delete(`/interviews/${sessionId}`)
+
+/** 切换收藏状态 */
+export const toggleFavorite = (sessionId: string) =>
+  request.patch<any, InterviewBrief>(`/interviews/${sessionId}/favorite`)

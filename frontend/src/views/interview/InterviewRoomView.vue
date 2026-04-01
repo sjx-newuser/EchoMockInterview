@@ -19,7 +19,8 @@ const {
   status, 
   isConnected, 
   connect, 
-  sendMessage 
+  sendMessage,
+  disconnect
 } = useWebSocket(sessionId)
 
 const { 
@@ -107,6 +108,13 @@ const scrollToBottom = async () => {
 
 watch(messages, () => scrollToBottom(), { deep: true })
 
+const handleFinish = () => {
+  // Disconnect WebSocket gracefully
+  disconnect()
+  // Navigate to the report page, which triggers lazy report generation
+  router.push(`/report/${sessionId}`)
+}
+
 onMounted(() => {
   fetchInterviewInfo()
 })
@@ -129,6 +137,9 @@ onMounted(() => {
           <span class="status-dot"></span>
           {{ status.message }}
         </div>
+        <button @click="handleFinish" class="btn-finish" v-if="isConnected">
+          结束并查看报告
+        </button>
       </div>
     </header>
 
@@ -194,11 +205,43 @@ onMounted(() => {
 }
 
 .btn-back {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--color-text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   margin-right: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-back:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateX(-2px);
+}
+
+.btn-finish {
+  background: #fff;
+  border: 1px solid #ff4d4f;
+  color: #ff4d4f;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-finish:hover {
+  background: #ff4d4f;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.2);
 }
 
 .interview-meta {
