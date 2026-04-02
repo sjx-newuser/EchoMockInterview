@@ -41,9 +41,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     --index-url https://mirrors.aliyun.com/pypi/simple/
 
-# Copy project
+# Copy application code
 COPY ./app /app/app
+# Copy scripts
+COPY ./scripts /app/scripts
+# Copy entrypoint
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Run application
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

@@ -1,3 +1,8 @@
+import os
+import sys
+# 将项目根目录加入 Python 搜索路径
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import asyncio
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from app.db.models import User, InterviewSession, DialogueMessage, QaEvaluation, SessionStatus, SpeakerRole, AudioAnalysisStatus

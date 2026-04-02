@@ -10,14 +10,21 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # 动态获取项目根目录，兼容本地和 Docker 部署
-_current_dir = Path(__file__).resolve().parent
-_PROJECT_ROOT = _current_dir
-for parent in _current_dir.parents:
-    if (parent / ".env").exists() or (parent / "backend").exists() or (parent / "docker-compose.yml").exists():
-        _PROJECT_ROOT = parent
-        break
+# 优先级：环境变量 PROJECT_ROOT > 自动探测 > 默认值
+_env_project_root = os.getenv("PROJECT_ROOT")
+if _env_project_root:
+    _PROJECT_ROOT = Path(_env_project_root)
 else:
-    _PROJECT_ROOT = _current_dir.parent.parent.parent  # 兜底到 backend
+    _current_dir = Path(__file__).resolve().parent
+    _PROJECT_ROOT = _current_dir
+    # 向上寻找特征文件
+    for parent in _current_dir.parents:
+        if (parent / ".env").exists() or (parent / "app").exists() or (parent / "docker-compose.yml").exists():
+            _PROJECT_ROOT = parent
+            break
+    else:
+        # Docker 环境下的兜底路径 (假设代码在 /app/app/...)
+        _PROJECT_ROOT = Path("/app")
 
 
 class Settings(BaseSettings):

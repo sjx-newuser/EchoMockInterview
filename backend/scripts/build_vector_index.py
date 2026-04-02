@@ -1,8 +1,8 @@
 """
 Echo Mock System - 离线向量索引构建脚本
 ========================================
-运行方式（在项目根目录下执行）：
-    python deploy_scripts/build_vector_index.py
+运行方式（在 backend 目录下执行）：
+    python scripts/build_vector_index.py
 
 功能：
     解析 data/raw/ 下的 Markdown/PDF/TXT 文件，
@@ -17,8 +17,8 @@ import sys
 import os
 import logging
 
-# 将 backend 目录加入 Python 搜索路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+# 将项目根目录加入 Python 搜索路径
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 logging.basicConfig(
     level=logging.INFO,

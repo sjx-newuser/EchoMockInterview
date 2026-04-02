@@ -1,8 +1,13 @@
-# scripts/init_sensevoice.py
+import os
+import sys
+# 将项目根目录加入 Python 搜索路径，以便能 import app.*
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import torch
 from funasr import AutoModel
 
 def download_and_init_model():
+    print("请确认已经执行过了 python scripts/init_sensevoice.py")
     print("正在连接 ModelScope 拉取 SenseVoice-Small 权重...")
     print("首次下载大约需要几分钟，请保持网络畅通。")
     

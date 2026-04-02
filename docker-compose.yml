@@ -10,6 +10,7 @@ services:
     volumes:
       - ./backend:/app
       - ./data:/app/data
+      - ./backend/scripts:/app/scripts
       # Prevent host node_modules (if any) from overriding container ones if there were any, 
       # but backend doesn't use node_modules, it uses pip.
     env_file:
@@ -23,6 +24,7 @@ services:
               capabilities: [gpu]
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
+      - PROJECT_ROOT=/app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s

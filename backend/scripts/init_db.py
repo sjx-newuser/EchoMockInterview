@@ -1,8 +1,8 @@
 """
 Echo Mock System - 数据库初始化脚本
 ====================================
-运行方式（在项目根目录下执行）：
-    python deploy_scripts/init_db.py
+运行方式（在 backend 目录下执行）：
+    python scripts/init_db.py
 
 功能：
     1. 根据 models.py 中的 ORM 定义，自动创建全部数据表。
@@ -13,8 +13,8 @@ import asyncio
 import sys
 import os
 
-# 将 backend 目录加入 Python 搜索路径，使脚本可在项目根目录直接运行
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+# 将项目根目录加入 Python 搜索路径，使脚本在任何目录下运行都能找到 app 模块
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.db.database import engine
 from app.db.models import Base
